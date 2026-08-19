@@ -1,4 +1,6 @@
 # ducks4-advanced
-Advanced haplotype prediction and allele-level resolution for DUCKS4 FSHD analysis: SSLP/SNP classification for subhaplotype prediction with phase-informed allele assignment, and per-RU restriction site analysis.
+Experimental major update of DUCKS4 introducing advanced allele assignment and homolog-specific phasing. This release is intended for testing and validation and should not yet be considered a stable workflow.
 
 ATTENTION: This is an EXPERIMENTAL repository and any output needs to be carefully revised.
+
+
