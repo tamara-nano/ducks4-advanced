@@ -13,6 +13,17 @@ The main aim is to resolve the four D4Z4 chromosome backgrounds at **4q35** and 
 
 The workflow combines physical D4Z4 structure, empirical proximal and distal SNV fingerprints, D4F104S1 and pLAM features, repeat origin, SSLP, PAS, optional phasing, BX repeat composition and allele-specific methylation.
 
+---
+
+## Background
+
+Facioscapulohumeral muscular dystrophy (FSHD) is associated with genetic and epigenetic changes of the D4Z4 repeat array at chromosome 4q35. Molecular analysis is complicated by the highly homologous D4Z4 region on chromosome 10q26, multiple permissive and non-permissive haplotypes, large tandem repeat arrays, somatic mosaicism and complex structural rearrangements.
+
+The original DUCKS4 workflow was developed to resolve individual long reads across this region and integrates D4Z4 repeat sizing, chromosome/haplotype assignment, methylation, structural variation and FSHD2-associated variant analysis.
+
+DUCKS4-Advanced builds on this concept by reconstructing allele-level read populations.
+
+---
 
 ## Installation
 
@@ -56,16 +67,6 @@ tags 	Infos
 --version 	show program's version number and exit.
 
 The output is saved in the folder where the original input file is located.
-
----
-
-## Background
-
-Facioscapulohumeral muscular dystrophy (FSHD) is associated with genetic and epigenetic changes of the D4Z4 repeat array at chromosome 4q35. Molecular analysis is complicated by the highly homologous D4Z4 region on chromosome 10q26, multiple permissive and non-permissive haplotypes, large tandem repeat arrays, somatic mosaicism and complex structural rearrangements.
-
-The original DUCKS4 workflow was developed to resolve individual long reads across this region and integrates D4Z4 repeat sizing, chromosome/haplotype assignment, methylation, structural variation and FSHD2-associated variant analysis.
-
-DUCKS4-Advanced builds on this concept by reconstructing allele-level read populations.
 
 ---
 
