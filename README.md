@@ -30,7 +30,7 @@ DUCKS4-Advanced builds on this concept by reconstructing allele-level read popul
 Pull docker image:
 
 ```text
-docker pull ghcr.io/tamara-nano/ducks4-advanced:v0.1.0
+docker pull ghcr.io/tamara-nano/ducks4-advanced:latest
 ```
 
 or
@@ -42,7 +42,7 @@ download repository and unzip it
 ```text
 cd /path/ducks4/
 
-docker build -t ghcr.io/tamara-nano/ducks4-advanced:v0.1.0 .
+docker build -t ghcr.io/tamara-nano/ducks4-advanced:latest .
 ```
   
 ## Usage
@@ -50,11 +50,11 @@ docker build -t ghcr.io/tamara-nano/ducks4-advanced:v0.1.0 .
 For running the tool:
 
 ```text
-docker run --rm -v $(pwd):/data ghcr.io/tamara-nano/ducks4-advanced:v0.1.0 --input /data/mysample.bam --allele-methyl --variant
+docker run --rm -v $(pwd):/data ghcr.io/tamara-nano/ducks4-advanced:latest --input /data/mysample.bam --allele-methyl --variant
 ```
 For showing more infos:
 ```text
-docker run -it --rm -v $(pwd):/data ghcr.io/tamara-nano/ducks4-advanced:v0.1.0 --help
+docker run -it --rm -v $(pwd):/data ghcr.io/tamara-nano/ducks4-advanced:latest --help
 ```
 
 | tags | infos |
@@ -181,7 +181,9 @@ Automated subtype calls remain conservative when two reference haplotypes are se
 
 ### 4. Empirical proximal and distal fingerprinting
 
-Allele-informative reads are used to discover empirical SNV patterns without forcing a predefined diploid model.
+DUCKS4-Advanced uses an "reference-guided but empirically learned fingerprinting approach" to distinguish sequence backgrounds at the D4Z4 locus. Proximal and distal informative reads are remapped to dedicated local references that provide a common coordinate system for variant comparison. Recurrent SNVs and small indels are then identified directly from the sample and combined into sparse per-read sequence fingerprints. Proximal fingerprint populations (`FP`) and distal fingerprint populations (`DFP`) are resolved independently, with repeat-derived variants accepted only when supported by the appropriate physical anchor such as D4F104S1 or pLAM. Complete molecules can directly link proximal and distal fingerprints into empirical components (`FC`). These fingerprints describe recurrent sequence backgrounds and different D4Z4 structures may therefore share the same fingerprint background. T2T or homolog-specific phasing is used as supporting linkage and QC information but are not used as primary basis for allele reconstruction.
+
+Allele-informative reads are used to discover empirical SNV patterns.
 
 Proximal populations are assigned identifiers such as:
 
@@ -201,8 +203,6 @@ DFP-B01
 ...
 ```
 
-Complete reads spanning both informative ends provide direct physical links between proximal and distal fingerprint populations.
-
 ### 5. Empirical component reconstruction
 
 FP and DFP populations are connected into empirical components:
@@ -214,8 +214,7 @@ FC03
 ...
 ```
 
-A complete-read FP ↔ DFP bridge provides the strongest local linkage.
-
+A complete-read FP <-> DFP bridge provides the strongest local linkage.
 When no complete bridge exists, additional evidence may be used conservatively, but an empirical component is not allowed to erase an independently supported structural difference.
 
 ### 6. Structural allele reconstruction
@@ -289,36 +288,17 @@ Dedicated phase may **not**:
 
 Raw dedicated phase groups can be retained as **phase-shadow QC views** for manual inspection in IGV.
 
+
 #### Why phasing is not used as primary allele evidence
 
-Phasing remains useful in DUCKS4-Advanced, especially in unique subtelomeric sequence and for linking unresolved reads to an already established allele. The limitation is specific to the D4Z4 locus: a PS/HP group is a local computational phasing solution and does not necessarily correspond one-to-one with a biological D4Z4 allele.
-
-Several properties of the locus make direct phase-based allele reconstruction unreliable:
-
-- **D4Z4 is highly repetitive and chr4/chr10 are strongly paralogous.** Reads from both loci can align to very similar sequence, and the informative SNVs available for phasing are unevenly distributed. Phase within the repeat region is therefore more vulnerable to ambiguous or locally fragmented alignments than phase in unique subtelomeric sequence.
-- **The patient allele can differ strongly from the reference array.** Contracted, expanded or otherwise structurally different arrays may align in several pieces against the reference. Such mapping fragmentation is not by itself evidence for a second allele or a structural rearrangement.
-- **Many informative reads are partial.** A proximal read and a distal read may each receive a phase label without physically connecting both ends of the allele. Phase can support a proposed linkage, but it cannot replace a complete molecule that directly bridges proximal and distal sequence.
-- **Dedicated reference phasing is local.** The 4qA proximal and distal rescue analyses are separate phasing problems. Their PS/HP labels are therefore treated as local labels until they are connected by shared complete molecules. `HP1` in one local analysis is not assumed to be equivalent to `HP1` in another independent analysis.
-- **A structural mosaic can share the same inherited phase background as its parent allele.** Phase can therefore support parental linkage but cannot decide whether two different complete structures represent the same allele, a constitutional second allele or a mosaic derivative.
+Phasing is used in DUCKS4-Advanced as supporting evidence, particularly in unique subtelomeric regions and for assigning otherwise unresolved reads to established alleles. However, due to the highly repetitive nature of D4Z4 and the strong sequence similarity between chr4 and chr10, reference-based phasing is not always reliable for reconstructing individual D4Z4 alleles. Informative SNVs are unevenly distributed, and alleles that differ substantially from the reference, for example through contractions, expansions or complex rearrangements, may show fragmented alignments that do not necessarily reflect their actual structure. Furthermore, many reads cover only proximal or distal parts of the array, meaning that shared phase information does not provide direct evidence that these regions belong to the same allele. This is particularly relevant for independently phased proximal and distal regions, where PS/HP labels are local and cannot be assumed to correspond across separate analyses without additional evidence. Structural mosaic alleles may also share the same inherited phase background, making phasing alone insufficient to distinguish different structural populations. For these reasons, DUCKS4-Advanced primarily relies on observed read structures, empirical proximal and distal sequence fingerprints, and direct connections established by complete molecules, while phasing is used to support or refine allele assignments where appropriate.
 
 #### Problems observed during validation
 
-These limitations were not only theoretical. During development, several recurrent failure modes were observed:
+During the development and validation of DUCKS4-Advanced, several limitations of phase-based allele assignment were observed. Structurally and empirically consistent allele populations were occasionally separated into different HP groups, while distinct SNV or structural populations could also be assigned to the same HP. Similar discrepancies were observed with dedicated-reference phasing, where reads belonging to the same proximal/distal fingerprint component could show different local phase assignments. In addition, proximal and distal phase information could not always be directly connected, particularly when no complete reads were available to bridge both regions. Structural mosaic populations presented another limitation, as they could share the same inherited phase background as their parental allele and therefore remain indistinguishable by phasing alone. Together with the high sequence similarity between chr4 and chr10 and the fragmented alignments frequently observed within the D4Z4 region, these observations showed that phase-based reconstruction could result in both artificial separation of individual alleles and merging of biologically distinct structural populations.
 
-- one structurally and empirically coherent allele population could be split across both HP1 and HP2;
-- different SNV or structural populations could be placed into the same HP;
-- dedicated-reference phasing could show a local HP mixture within an otherwise concordant FP/DFP component;
-- proximal and distal phase assignments could not always be connected directly because no complete molecule covered both informative regions;
-- phase alone could not distinguish a structural mosaic from its constitutional parent when both shared the same chromosome background;
-- chr4/chr10 paralogy and repeat-associated mapping fragmentation could create phase patterns that were technically reproducible but biologically misleading if interpreted as allele identity.
+Consequently, DUCKS4-Advanced establishes allele identity primarily through observed read structures, empirical proximal and distal sequence fingerprints, and direct FP <-> DFP connections supported by complete reads. T2T phasing is subsequently used as supporting evidence for chromosome or subtelomeric linkage, while dedicated 4qA/4qB/10qA phasing is applied as conditional rescue or for additional quality control of unresolved populations. If phase assignments disagree with stronger structural or empirical evidence, the original allele assignment is retained and the discrepancy is documented rather than forcing a phase-based reassignment. Detailed allele assignment and phasing results are available under `data/assignment-qc/`.
 
-Using PS/HP as the primary allele-definition layer would therefore cause both over-splitting and over-merging: one true allele can appear as two phase populations, while two genuinely different structural populations can appear on the same phase background.
-
-For this reason, DUCKS4-Advanced uses phase only after the main allele evidence has been established. Complete physical structure, empirical proximal/distal fingerprints and complete-read FP ↔ DFP bridges remain primary. Generic T2T phase is used for supportive chromosome/subtelomere linkage and further confirmation. Dedicated 4qA/4qB/10qA phasing is run only as conditional rescue or QC for unresolved populations.
-
-If phase disagrees with stronger structural or empirical evidence, the allele assignment is retained and the phase disagreement is reported as QC.
-
-Detailed assignment and phasing results are retained under `data/assignment-qc/`.
 
 ### 10. Allele-specific methylation
 
@@ -337,7 +317,7 @@ Reported regions include, where available:
 
 ### 11. BX repeat composition
 
-The DUCKS4 BX check classifies individual D4Z4 repeat units using BinI/XapI restriction-site patterns and generates a per-RU array structure.
+The DUCKS4 BX-check classifies individual D4Z4 repeat units using BinI/XapI restriction-site patterns and generates a per-RU array structure.
 
 This provides an additional structural description of chr4-like, chr10-like and hybrid repeat units and is particularly useful for complex arrays.
 
@@ -414,7 +394,7 @@ Featuers:
 
 ### Mode A: for creating a custom reference
 ```
-docker run -it --rm -v "$(pwd)":/data ghcr.io/tamara-nano/fshd_ducks4:latest id2bam2meth \
+docker run -it --rm -v "$(pwd)":/data ghcr.io/tamara-nano/ducks4-advanced:latest id2bam2meth \
   --id_ref READ_ID \
   --bam_ref /data/sample-containing_id_ref-read.bam \
   --bam /data/sample.bam \
@@ -432,7 +412,7 @@ The BX restriction site check is automatically run after methylation analysis an
 
 ### Mode B: providing an existing reference
 ```
-docker run -it --rm -v "$(pwd)":/data ghcr.io/tamara-nano/fshd_ducks4:latest id2bam2meth \
+docker run -it --rm -v "$(pwd)":/data ghcr.io/tamara-nano/ducks4-advanced:latest id2bam2meth \
   --ref /data/ref.fasta \
   --bam /data/sample.bam \
   --txt /data/read-ids.txt \
@@ -465,7 +445,7 @@ read-id5
 
 ### For showing more infos:
 
-`docker run -it --rm -v "$(pwd)":/data ghcr.io/tamara-nano/fshd_ducks4:latest id2bam2meth --help`
+`docker run -it --rm -v "$(pwd)":/data ghcr.io/tamara-nano/ducks4-advanced:latest id2bam2meth --help`
 
 | **tags** | **Infos** |
 |:-----------------------------|:-----------------------------------------|
