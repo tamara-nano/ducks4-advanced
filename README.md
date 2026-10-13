@@ -218,7 +218,7 @@ A partial read provides a lower bound, not an exact allele size.
 Partial alleles are therefore reported as:
 
 ```text
-grN
+grN      -> "greater N"
 ```
 
 meaning **at least N repeat units**.
