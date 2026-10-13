@@ -20,7 +20,8 @@ Pull docker image:
 
 ```text
 docker pull ghcr.io/tamara-nano/ducks4-advanced:v0.1.0
-...
+```
+
 or
 
 Build image with dockerfile:
@@ -31,17 +32,20 @@ download repository and unzip it
 cd /path/ducks4/
 
 docker build -t ghcr.io/tamara-nano/ducks4-advanced:v0.1.0 .
-...
+```
   
 ## Usage
 
 For running the tool:
 
+```text
 docker run --rm -v $(pwd):/data ghcr.io/tamara-nano/ducks4-advanced:v0.1.0 --input /data/mysample.bam --allele-methyl --variant
-
+```
 For showing more infos:
-
+```text
 docker run -it --rm -v $(pwd):/data ghcr.io/tamara-nano/ducks4-advanced:v0.1.0 --help
+```
+
 tags 	Infos
 --input 	provide input-file. Best start with your basecalled SUP bam or fastq/fastq.gz-file.
 --allele-methyl        automated allele-specific alignment and phasing with id2bam2meth
