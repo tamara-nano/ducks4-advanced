@@ -57,14 +57,14 @@ For showing more infos:
 docker run -it --rm -v $(pwd):/data ghcr.io/tamara-nano/ducks4-advanced:v0.1.0 --help
 ```
 
-tags 	Infos
---input 	provide input-file. Best start with your basecalled SUP bam or fastq/fastq.gz-file.
---allele-methyl        automated allele-specific alignment and phasing with id2bam2meth
---phased-t2t-only        phasing with longphase is only performed for the 4q35 and 10q26 region for T2T-chm13v2.0 for D4Z4 allele-assignment.
---variant 	optional, alignment to HG38, variant calling with clair3, sniffles2 (sniffles also calls against the T2T-aligned bam-file), phasing with whatshap and variant annotation with SNPEff and SnpSift against ClinVar (v20250729).
---methyl 	optional, legacy methylation calling with modkit, target region: chr4:193540172-193543634.
---threads 	optional, set threads.
---version 	show program's version number and exit.
+| tags | infos |
+|:--|:--|
+| --input | provide input-file. Best start with your basecalled SUP bam or fastq/fastq.gz-file. |
+| --allele-methyl | Run allele-specific methylation after allele assignment. |
+| --variant | Activate full variant calling with Clair3/Sniffles2 on HG38 + T2T phasing for D4Z4-allele assignment. |
+| --phased-t2t-only | Run only T2T FSHD-region phasing for D4Z4-allele assignment, without HG38 variant calling. |
+| --phased | Input BAM contains phasing tags HP/PS from T2T-phasing; use them for allele assignment |
+| --threads | Set your amount of threads. Default is 45. |
 
 The output is saved in the folder where the original input file is located.
 
