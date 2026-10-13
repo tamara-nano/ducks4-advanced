@@ -485,20 +485,107 @@ Per-allele BAMs, phase-shadow QC BAMs and the final evidence tables are designed
 
 ---
 
-## ID2bam2meth
+## ID2bam2meth - analysis of individual read-subsets
 
-The original DUCKS4 `ID2bam2meth` utility remains useful for targeted read subsets, custom-reference alignment and detailed methylation analysis.
-
-It can:
-
-- build a custom reference from a selected read;
-- realign an allele-specific read subset;
-- generate a curated BLAST-based annotation BED;
-- calculate methylation per annotated region and repeat unit;
-- generate distal-unit methylation summaries;
-- run the BX restriction-site analysis.
-
+The DUCKS4 `ID2bam2meth` utility remains useful for targeted read subsets, custom-reference alignment and detailed methylation analysis.
 For the advanced workflow, the preferred read subsets are the final allele-specific read IDs generated under `assigned-alleles/` and `allele-bam-tables/`.
+
+With this script it is possible to define a custom reference from a chosen read via read-id (e.g. choose a complete read from the 4qA output).
+Optionally provide a subset of reads to align against (either read-ids via TXT and/or a BAM-file) and optionally call methylation.
+For the custom reference the blast-results of this read are annotated within an annotation.bed file and if --methyl is chosen the average methylation will be calculated for each entry within the annotation.bed file.
+The results can then be further inspected in a genome viewer like the IGV-browser.
+
+Featuers:
+- build a custom reference from a selected read
+- realign an allele-specific read subset
+- generate a curated BLAST-based annotation BED
+- calculate methylation per annotated region and repeat unit
+- generate methylation summaries
+- run the BX restriction-site analysis
+
+### Mode A: for creating a custom reference
+```
+docker run -it --rm -v "$(pwd)":/data ghcr.io/tamara-nano/fshd_ducks4:latest id2bam2meth \
+  --id_ref READ_ID \
+  --bam_ref /data/sample-containing_id_ref-read.bam \
+  --bam /data/sample.bam \
+  --txt /data/read-ids.txt \
+  --methyl
+```
+
+**Note**: \
+From the read-id a reference FASTA, FAIDX and annotation.bed file from the blast-output is created. \
+Please be aware that the id_ref needs to be present in the bam_ref input. \
+Methylation is called over all regions from the annotation.bed if no other regions are given (e.g. --regions_bed). \
+Therefore a methylation-gradient over all D4Z4-RUs can be called and will be provided as .bedgraph output and for convenience as .bed file with values as labels.
+Also an aggregated region as distal_unit containing the most distal repeat and pLAM region is defined and methylation called for it.
+The BX restriction site check is automatically run after methylation analysis and results are written to `{out_prefix}/D4Z4_BX_check/`.
+
+### Mode B: providing an existing reference
+```
+docker run -it --rm -v "$(pwd)":/data ghcr.io/tamara-nano/fshd_ducks4:latest id2bam2meth \
+  --ref /data/ref.fasta \
+  --bam /data/sample.bam \
+  --txt /data/read-ids.txt \
+  --methyl \
+...
+  optional:
+...
+  --region chr:start-end
+```
+or
+```
+  --regions_bed /data/regions.bed
+```
+
+**Note**: \
+If no custom regions are provided, ID2bam2meth automatically generates annotations from the supplied reference FASTA using BLAST. \
+The reference FASTA is automatically copied into the output folder for use with the BX check and IGV visualization.
+
+### Creating the read-ID.txt:
+Simply copy the read-IDs you want to subset and filter from the DUCKS4-output tables into a txt-file:
+
+Format read-id.txt:
+
+```
+read-id1
+read-id3
+read-id5
+...
+```
+
+### For showing more infos:
+
+`docker run -it --rm -v "$(pwd)":/data ghcr.io/tamara-nano/fshd_ducks4:latest id2bam2meth --help`
+
+| **tags** | **Infos** |
+|:-----------------------------|:-----------------------------------------|
+| **Mode A - create custom ref** | |
+| --id_ref | optional, Input read_id from a read (best a complete read) to use as the custom reference (Mode A). |
+| --bam_ref | optional, Input BAM file where the reference-read is located (Mode A). |
+| --out_prefix | optional, Prefix for naming the reference (default: read-ID) (Mode A). |
+| **Mode B - existing ref** | |
+| --ref | optional, Use an existing reference FASTA (Mode B). |
+| **reads for alignment** | |
+| --bam | optional, Input BAM to extract/align reads against the reference. |
+| --txt | optional, Optional read_id.txt to subset reads from --bam to be aligned to reference. |
+| **Methylation** | |
+| --methyl | optional, Methylation calculation for the reads. Methylation calculation happens over the whole repeat-array for the mean CpG value for each D4Z4. |
+| --region | optional, single region in chr:start-end format. |
+| --regions_bed | optional, BED file with multiple regions. |
+| --skip-bx | optional, skip the BX restriction site check. |
+| **Outputs** | |
+| --threads | optional, Set your amount of threads. Default is 45. |
+| --out_path | optional, Give output path, default: path from --bam_ref. |
+
+### Output:
+
+- Mode A: reference.fasta, reference.fasta.fai, annotation.bed generated from read_id
+- Mode A & B: The annotation is generated automatically using BLAST and curate_annotation_bed.py.
+- aligned reads.bam / subset-reads.bam to reference
+- Methylation: alignedreads.bedgraph, alignedreads.bed, alignedreads.methylbed, modkit-stats.tsv for the annotated regions if no region/regions_bed is provided.
+- D4Z4_BX_check/: BinI/XapI restriction site classification per RU (see BX check section above)
+
 
 ---
 
