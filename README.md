@@ -30,6 +30,40 @@ The main aim is to resolve the four D4Z4 chromosome backgrounds at **4q35** and 
 The workflow combines physical D4Z4 structure, empirical proximal and distal SNV fingerprints, D4F104S1 and pLAM features, repeat origin, SSLP, PAS, optional phasing, BX repeat composition and allele-specific methylation.
 
 
+Installation
+
+Pull docker image:
+
+docker pull ghcr.io/tamara-nano/ducks4-advanced:v0.1.0
+
+or
+
+Build image with dockerfile:
+
+download repository and unzip it
+cd /path/ducks4/
+
+docker build -t ghcr.io/tamara-nano/ducks4-advanced:v0.1.0 .  
+Usage
+
+For running the tool:
+
+docker run --rm -v $(pwd):/data ghcr.io/tamara-nano/fshd_ducks4:latest --input /data/mysample.bam --methyl --variant
+
+For showing more infos:
+
+docker run -it --rm -v $(pwd):/data ghcr.io/tamara-nano/fshd_ducks4:latest --help
+tags 	Infos
+--input 	provide input-file. Best start with your basecalled SUP bam or fastq/fastq.gz-file.
+--allele-methyl        automated allele-specific alignment and phasing with id2bam2meth
+--phased-t2t-only        phasing is only performed for the 4q35 and 10q26 region for T2T-chm13v2.0 for allele-assignment
+--variant 	optional, alignment to HG38, variant calling with clair3, sniffles2 (sniffles also calls against the T2T-aligned bam-file), phasing with longphase and variant annotation with SNPEff and SnpSift against ClinVar (v20250729).
+--methyl 	optional, legacy methylation calling with modkit, target region: chr4:193540172-193543634.
+--threads 	optional, set threads.
+--version 	show program's version number and exit.
+
+The output is saved in the folder where the original input file is located.
+
 ---
 
 ## Background
