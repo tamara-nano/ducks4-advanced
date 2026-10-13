@@ -322,7 +322,7 @@ Detailed assignment and phasing results are retained under `data/assignment-qc/`
 
 ### 10. Allele-specific methylation
 
-Allele-specific BAMs can be used for methylation calling and summarized across defined D4Z4 regions.
+Allele-specific BAMs can be used for methylation calling and summarized across defined D4Z4 regions and is reported for each array-element.
 
 Reported regions include, where available:
 
@@ -343,39 +343,6 @@ This provides an additional structural description of chr4-like, chr10-like and 
 
 ---
 
-## Method characteristics and current limitations
-
-DUCKS4-Advanced uses an evidence hierarchy tailored to Oxford Nanopore long-read data and the D4Z4 locus. The workflow combines **physical molecule structure** with sample-specific sequence backgrounds and native methylation information.
-
-### Features
-
-- **Direct structural evidence from very long molecules.** Complete reads can physically connect D4F104S1, the D4Z4 array and the distal pLAM region. When such a molecule is available, its observed structure has priority over inferred linkage or phase evidence.
-- **Complete and partial reads are both retained.** Long alleles do not need to be discarded when no complete molecule is available. Proximal and distal observations are kept independently and reported conservatively as lower-bound structures.
-- **Empirical fingerprinting is de novo.** Proximal and distal FP/DFP populations are learned from recurrent SNVs and small indels in the sample and are not forced into a predefined number of haplotypes.
-- **Physical FP ↔ DFP linkage.** Complete reads can directly connect independently discovered proximal and distal sequence backgrounds into an empirical component.
-- **Structure and inherited background are kept separate.** Different exact D4Z4 structures can occur on the same FP/DFP background. This is essential for mosaic and other structurally derived alleles.
-- **Mosaic/complex populations are not automatically collapsed.** A recurrent minor complete-read structure can remain separate even when it shares fingerprint and phase background with a constitutional parent allele.
-- **Native methylation can be retained allele-specifically.** Final allele BAMs and custom references allow methylation to be evaluated across individual repeat units and defined proximal/distal regions.
-- **Uncertainty is retained.** Reads, homologs or partial structures that cannot be assigned safely remain unresolved rather than being forced into a four-allele or HP1/HP2 model.
-- **Detailed evidence remains inspectable.** Per-allele BAMs, read lists, fingerprint tables, assignment audits and phase-shadow outputs are retained for manual review and reproducibility.
-
-### Current limitations and difficult cases
-
-- **ONT sequence errors require population-level evidence.** Single-read SNV or indel differences are not sufficient to define a fingerprint. Recurrent population consensuses are required, and indel-only splits are intentionally more conservative.
-- **D4Z4 repeat mapping remains difficult.** Internal repeat units can map interchangeably to similar reference units. Proximal repeat-derived fingerprint calls are therefore accepted only with physical proximal anchoring, and distal repeat-derived calls require physical distal/pLAM anchoring.
-- **Sparse coverage can leave fingerprints unresolved.** A true sequence background may not receive an FP or DFP when too few reads cover discriminating sites. Missing fingerprint evidence is not interpreted as evidence that two alleles are identical.
-- **Fingerprint IDs are sample-specific.** `FP01`, `DFP-A01` and `FC01` are local identifiers and are not intended to represent universal haplotypes across samples.
-- **A fingerprint component is not identical to a structural allele.** Mosaic or other derived structures can share the same inherited component. Complete physical structures therefore remain separate when they differ.
-- **Very long arrays may remain partial.** If no molecule physically spans the whole array, DUCKS4-Advanced reports a lower bound.
-- **Generic and dedicated phasing can be locally inconsistent.** Phase is therefore supporting evidence only; the known problems and safeguards are described above.
-- **Low-level mosaic detection depends on molecule support.** A minor structure needs positive structural evidence. Spanning-read counts are affected by read length and are not used directly as an unbiased estimate of mosaic fraction.
-- **Complex rearrangements can exceed the current automatic model.** Duplicated arrays, large proximal deletions and unusual breakpoint structures may be retained for structural review and still require manual BAM/IGV inspection.
-- **Translocation calls are deliberately conservative.** Internal hybrid/BX repeat composition alone does not define a translocation. A possible chr4/chr10 translocation is considered only when proximal chromosome origin and distal haplotype origin disagree (`chr4 → chr10` or `chr10 → chr4`) and the combination is not explained by a known haplotype.
-
-Interpretation is most robust when direct long-molecule structure and recurrent empirical sequence evidence support the same result. The main remaining difficulty is the reconstruction of very long, low-coverage or structurally unusual arrays when no single molecule spans all informative regions.
-
----
-
 
 ## Output
 
@@ -389,17 +356,17 @@ FSHD-analysis_SAMPLE/
 ├── haplotypes/
 │   ├── original haplotype/read tables
 │   ├── read IDs
-│   └── BAM / BAI
+│   └── haplotypes_complete/all.BAM / BAI
 │
 ├── assigned-alleles/
 │   ├── allele_summary.tsv
 │   ├── allele_anchors.csv
 │   ├── assigned_alleles.csv
 │   ├── allele-bam-tables/
-        -> alleles aligned to the T2T-chm13v2.0 reference
+│       -> alleles aligned to the T2T-chm13v2.0 reference
 │   ├── read-IDs/
 │   └── allele_methylation/
-        --> alleles aligned to custom references (id2bam2meth) for improved methylation calling with modkit
+│       -> alleles aligned to custom references (id2bam2meth) for improved methylation calling with modkit
 │
 └── data/
     ├── fingerprint-backgrounds/
@@ -424,64 +391,6 @@ FSHD-analysis_SAMPLE/
 
 Intermediate BLAST, fingerprinting, phasing, QC and methylation files are retained under `data/`.
 
----
-
-## Reported allele properties
-
-Depending on available evidence, the final allele-level report contains:
-
-- chromosome
-- broad haplotype class
-- predicted haplotype subtype
-- exact RU count or lower-bound `grN`
-- complete / proximal / distal read support
-- D4F104S1 type
-- D4F104S1 SNV consensus
-- SSLP consensus
-- pLAM / PAS
-- S/L state
-- empirical FP / DFP / FC
-- generic and dedicated phase information
-- BX array composition
-- structural warnings
-- mosaic / complex classification
-- assignment confidence
-- methylation values
-- FSHD-oriented interpretation
-
----
-
-## Interpretation safeguards
-
-DUCKS4-Advanced intentionally avoids overcalling when the available reads cannot resolve a biological distinction.
-
-Examples include:
-
-- sequence-identical haplotype subtypes requiring an independent/manual discriminator;
-- partial alleles with only lower-bound repeat length;
-- unresolved homologs;
-- locally unreliable phasing;
-- highly paralogous chr4/chr10 alignments;
-- structurally complex arrays;
-- low-support mosaic candidates.
-
-The workflow reports these states explicitly instead of forcing a complete diploid solution.
-
----
-
-## Manual review
-
-Even though the advanced workflow performs automatic allele reconstruction, manual review remains recommended for:
-
-- contracted pathogenic candidates
-- complex or hybrid structures
-- mosaic candidates
-- unresolved homologs
-- ambiguous haplotype subtypes
-- unusual chr4/chr10 repeat composition
-- phase/fingerprint disagreement
-
-Per-allele BAMs, phase-shadow QC BAMs and the final evidence tables are designed to support inspection in IGV.
 
 ---
 
