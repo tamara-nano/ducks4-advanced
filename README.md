@@ -234,6 +234,10 @@ The workflow integrates:
 - structural integrity
 - supporting read counts
 
+#### SSLP annotation
+
+The SSLP is reported using the compact annotation described for the classical D4Z4 haplotypes. Because the T2T reference represents the locus in its full genomic sequence context, DUCKS4 extracts the corresponding SSLP sequence from the aligned reads and converts it to a standardized short annotation for comparison with the published haplotype nomenclature. The SSLP repeat structure and the characteristic ±8 bp variant are retained in this representation. SSLP information is evaluated together with the D4F104S1 SNV pattern for haplotype matching.
+
 #### Complete alleles
 
 A complete/spanning read can define an exact D4Z4 repeat length.
