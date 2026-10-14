@@ -32,18 +32,6 @@ Pull docker image:
 ```text
 docker pull ghcr.io/tamara-nano/ducks4-advanced:latest
 ```
-
-or
-
-Build image with dockerfile:
-
-download repository and unzip it
-
-```text
-cd /path/ducks4/
-
-docker build -t ghcr.io/tamara-nano/ducks4-advanced:latest .
-```
   
 ## Usage
 
