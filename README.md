@@ -11,7 +11,7 @@ DUCKS4-Advanced extends the original **DUCKS4** workflow with automated reconstr
 
 The main aim is to resolve the four D4Z4 chromosome backgrounds at **4q35** and **10q26** from complete and informative partial reads while retaining complex, mosaic and hybrid structures.
 
-The workflow combines physical D4Z4 structure, empirical proximal and distal SNV fingerprints, D4F104S1 and pLAM features, repeat origin, SSLP, PAS, optional phasing, BX repeat composition and allele-specific methylation.
+The workflow combines D4Z4-array structure, proximal and distal SNV fingerprints, D4F104S1 and pLAM features, repeat origin, SSLP, PAS, optional phasing, BX repeat composition and allele-specific methylation.
 
 ---
 
