@@ -317,10 +317,7 @@ read-id5
 
 The original DUCKS4 workflow is described in:
 
-> Löwenstern T, Madritsch S, Horner D, Brait N, Güleray Lafci N, Schachner A, Gerykova Bujalkova M, Kałużewski T, Szyld P, Hengstschläger M, Dremsek P, Laccone F.  
-> **DUCKS4: a comprehensive workflow for Nanopore sequencing analysis of facioscapulohumeral muscular dystrophy (FSHD).**  
-> *Human Genomics*. 2026;20(1):48.  
-> doi: **10.1186/s40246-026-00921-2**
+<Löwenstern T, Madritsch S, Horner D, Brait N, Güleray Lafci N, Schachner A, Gerykova Bujalkova M, Kałużewski T, Szyld P, Hengstschläger M, Dremsek P, Laccone F. DUCKS4: a comprehensive workflow for Nanopore sequencing analysis of facioscapulohumeral muscular dystrophy (FSHD). Hum Genomics. 2026 Feb 6;20(1):48. doi: 10.1186/s40246-026-00921-2. PMID: 41652446; PMCID: PMC12977661.>
 
 If DUCKS4-Advanced is used for research, please cite the original DUCKS4 publication and specify that the experimental advanced allele-reconstruction branch was used.
 
