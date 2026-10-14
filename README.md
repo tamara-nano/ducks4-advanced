@@ -70,262 +70,95 @@ The output is saved in the folder where the original input file is located.
 
 ---
 
-## Core concept
 
-The central rule of DUCKS4-Advanced is:
+## Concept
 
-Physical D4Z4 structure and empirical sequence fingerprints define biological alleles whereas phasing is supportive evidence only.
+DUCKS4-Advanced reconstructs individual D4Z4 alleles from physical long-read structure and empirically derived sequence fingerprints. Phasing is used as supporting evidence only.
 
-Three concepts are therefore kept separate:
+Three types of information are kept separate:
 
-### 1. Structural D4Z4 allele
+### Structural allele
 
-Defined from physical long-read evidence such as:
+A structural allele is defined from direct long-read evidence, including repeat number, proximal and distal anchors, D4F104S1, pLAM/PAS, terminal S/L state and D4Z4 repeat composition. Complete reads can define an exact structure, while partial reads provide conservative lower-bound information.
 
-- repeat number
-- complete proximal-to-distal structure
-- D4F104S1 state
-- pLAM / PAS
-- S/L terminal unit
-- D4Z4 repeat composition
-- complete versus partial read status
+### Empirical sequence fingerprint
 
-### 2. Empirical sequence background
+Recurrent SNVs and small indels observed within the sample are used to define proximal (`FP`) and distal (`DFP`) sequence backgrounds. Complete reads can directly connect an FP and DFP into a fingerprint component (`FC`).
 
-Defined from SNVs observed directly in the sequenced cohort:
+`DFP-Axx` represents the 4qA/10qA-compatible distal class, whereas `DFP-Bxx` represents the 4qB-compatible distal class.
 
-- proximal fingerprint: `FP01`, `FP02`, ...
-- distal fingerprint: `DFP-A01`, `DFP-B01`, ...
-- FP ↔ DFP linkage from complete reads
-- empirical component: `FC01`, `FC02`, ...
+A fingerprint describes a sequence background and is not identical to a structural allele. Different D4Z4 structures can therefore share the same fingerprint component.
 
-An empirical fingerprint is defined by recurrent sequence variants like SNVs and INDELS. Different structural alleles may occur on the same fingerprint background, for example when a mosaic structural derivative is present.
+### Phasing
 
-### 3. Phase group
+T2T and homolog-specific PS/HP information is used to support linkage of unresolved reads and as an additional QC layer. Phase does not independently define an allele and does not override stronger structural or fingerprint evidence.
 
-LongPhase PS/HP information describes a phasing solution, but does not independently define a D4Z4 allele.
-
-This distinction is important because local phasing within D4Z4 can:
-
-- split reads from one structural/fingerprint population into HP1 and HP2;
-- place strongly different SNV populations into the same phase group;
-- mix reads originating from the paralogous chr4 and chr10 regions;
-- assign a mosaic allele to the same inherited haplotype background as its parental allele.
-
-For this reason LongPhase is used for linkage, rescue and QC but it will not override stronger structural or fingerprint evidence.
 
 ---
 
-## Evidence hierarchy
+## Hierarchy for allele reconstruction
 
-DUCKS4-Advanced uses the following hierarchy for allele reconstruction:
+DUCKS4-Advanced uses the following evidence hierarchy:
 
-1. **Complete physical D4Z4 structure**
-2. **Empirical proximal and distal SNV fingerprints**
-3. **Complete-read FP ↔ DFP bridge**
-4. **From the fingerprints derived Empirical components**
-5. **D4F104S1 / SSLP / PAS / other sequence features**
-6. **Generic T2T phase for supporting linkage**
-7. **Dedicated homolog-specific LongPhase for rescue / QC**
+1. Physical D4Z4 structure
+2. Empirical proximal and distal sequence fingerprints
+3. Complete-read FP <-> DFP linkage
+4. Additional locus-specific sequence features
+5. T2T and homolog-specific phasing
 
-A lower evidence layer must not overwrite a contradiction established by a higher layer.
+Lower evidence layers do not override contradictions established by stronger physical or empirical evidence.
 
 ### Consequences
 
-- Opposite HP labels alone do not justify splitting one structural allele into two.
-- Shared HP labels do not justify merging structurally or sequence-distinct populations.
-- Established complete reads are not reassigned because of phase.
-- A strongly supported complete structure is not demoted to mosaic solely because it shares a phase background with another allele.
-- Phase may help an unresolved partial read follow an already established allele if structure and fingerprint evidence remain compatible.
-- If the data do not resolve a homolog, DUCKS4-Advanced keeps it unresolved.
+Phasing is used as supporting evidence and does not override stronger structural or fingerprint evidence. Opposite HP labels are therefore not sufficient to split one structural allele, while shared HP labels are not sufficient to merge distinct structural or sequence populations. Complete-read structures remain protected from reassignment or mosaic demotion based on phase alone. For unresolved partial reads, phase can support assignment to an already established allele when the structural and fingerprint evidence is compatible. If the available evidence is insufficient, the homolog remains unresolved.
 
 ---
 
 ## Workflow
 
-### 1. Input and T2T mapping
+### 1. T2T mapping and structural annotation
 
-The workflow starts from basecalled long-read sequencing data and aligns reads to **T2T-CHM13v2.0**.
+Long reads are aligned to T2T-CHM13v2.0 and reads overlapping the D4Z4-associated regions on 4q35 and 10q26 are retained. BLAST-based annotation identifies D4F104S1, D4Z4 repeat units, pLAM/PAS and other locus-specific features.
 
-Reads overlapping the FSHD-associated regions on 4q35 and 10q26 are retained for downstream analysis.
+### 2. Haplotype annotation
 
-### 2. Structural annotation
-
-D4Z4-associated elements are identified by BLAST-based annotation.
-
-The orientation used throughout DUCKS4 is:
-
-```text
-proximal                                               distal
-D4F104S1  →  D4Z4 repeat array  →  terminal D4Z4  →  pLAM / PAS
-```
-
-The workflow evaluates:
-
-- **D4F104S1** as the proximal anchor
-- individual D4Z4 repeat units
-- **pLAM** as the distal anchor
-- PAS sequence
-- SSLP structure
-- S/L terminal repeat state
-- chr4/chr10-specific structural markers
-- D4Z4 repeat origin
-
-Repeat origin is evaluated independently for individual D4Z4 units using local chr4/chr10 sequence similarity.
-
-### 3. Haplotype prediction
-
-D4F104S1 SNVs, SSLP structure, pLAM, PAS, D4Z4 composition and chromosome-specific markers are combined to predict chromosome and broad haplotype class.
-
-Automated subtype calls remain conservative when two reference haplotypes are sequence-indistinguishable using the available markers. Such cases remain unresolved until an independent/manual discriminator is available.
-
-### 4. Empirical proximal and distal fingerprinting
-
-DUCKS4-Advanced uses an "reference-guided but empirically learned fingerprinting approach" to distinguish sequence backgrounds at the D4Z4 locus. Proximal and distal informative reads are remapped to dedicated local references that provide a common coordinate system for variant comparison. Recurrent SNVs and small indels are then identified directly from the sample and combined into sparse per-read sequence fingerprints. Proximal fingerprint populations (`FP`) and distal fingerprint populations (`DFP`) are resolved independently, with repeat-derived variants accepted only when supported by the appropriate physical anchor such as D4F104S1 or pLAM. Complete molecules can directly link proximal and distal fingerprints into empirical components (`FC`). These fingerprints describe recurrent sequence backgrounds and different D4Z4 structures may therefore share the same fingerprint background. T2T or homolog-specific phasing is used as supporting linkage and QC information but are not used as primary basis for allele reconstruction.
-
-Allele-informative reads are used to discover empirical SNV patterns.
-
-Proximal populations are assigned identifiers such as:
-
-```text
-FP01
-FP02
-FP03
-...
-```
-
-Distal populations are assigned identifiers such as:
-
-```text
-DFP-A01
-DFP-A02
-DFP-B01
-...
-```
-
-### 5. Empirical component reconstruction
-
-FP and DFP populations are connected into empirical components:
-
-```text
-FC01
-FC02
-FC03
-...
-```
-
-A complete-read FP <-> DFP bridge provides the strongest local linkage.
-When no complete bridge exists, additional evidence may be used conservatively, but an empirical component is not allowed to erase an independently supported structural difference.
-
-### 6. Structural allele reconstruction
-
-Final alleles are built from complete and informative partial reads.
-
-The workflow integrates:
-
-- exact or lower-bound RU count
-- proximal and distal anchors
-- D4F104S1 state
-- pLAM / PAS
-- S/L state
-- repeat origin
-- empirical FP / DFP / FC background
-- compatible haplotype information
-- structural integrity
-- supporting read counts
+D4F104S1 SNVs, SSLP, pLAM/PAS, repeat composition and chromosome-specific markers are used to determine compatible chromosome and haplotype classes and if possible exact haplotypes.
 
 #### SSLP annotation
+The SSLP is reported using the compact annotation described for the classical D4Z4 haplotypes. Because the T2T reference represents the locus in its full genomic sequence context, DUCKS4 extracts the corresponding SSLP sequence from the aligned reads and converts it to a short annotation for comparison with the published haplotype nomenclature. The SSLP repeat structure and the characteristic ±8 bp variant are retained in this representation. SSLP information is evaluated together with the D4F104S1 SNV pattern for haplotype matching.
 
-The SSLP is reported using the compact annotation described for the classical D4Z4 haplotypes. Because the T2T reference represents the locus in its full genomic sequence context, DUCKS4 extracts the corresponding SSLP sequence from the aligned reads and converts it to a standardized short annotation for comparison with the published haplotype nomenclature. The SSLP repeat structure and the characteristic ±8 bp variant are retained in this representation. SSLP information is evaluated together with the D4F104S1 SNV pattern for haplotype matching.
+### 3. Empirical fingerprinting
 
-The complete observed SSLP sequence is retained in `SSLP.txt` in the `sslp_sequence_manual` column. The full compressed repeat annotation is available as `sslp_annotation`, while the shortened haplotype-style representation used for matching is stored as `sslp_haplotype_annotation`.
+DUCKS4-Advanced uses a reference-guided but empirically derived fingerprinting approach. Proximal and distal informative reads are realigned to dedicated local references, and recurrent SNVs and small indels are identified directly from the sample.
 
-#### Complete alleles
+Proximal populations are labelled `FP01`, `FP02`, ... and distal populations `DFP-A01`, `DFP-B01`, ... . Complete molecules can directly connect proximal and distal fingerprints into fingerprint components (`FC`).
 
-A complete/spanning read can define an exact D4Z4 repeat length.
+Repeat-derived variants are accepted only when physically anchored to the appropriate proximal or distal region.
 
-#### Partial alleles
+### 4. Allele reconstruction
 
-A partial read provides a lower bound and the allele-size is based on the longest compatible observed proximal or distal read.
+Final alleles are reconstructed from complete and informative partial reads using physical structure, FP/DFP/FC background and compatible locus-specific sequence information.
+Complete reads can define exact repeat numbers. If no molecule spans the complete array, the observed structure is reported as a lower bound (`grN` -> `greater than N RUs`).
 
-Partial alleles are therefore reported as:
+### 5. Phasing and unresolved reads
 
-```text
-grN      -> "greater than N RUs"
-```
+T2T PS/HP information can support linkage of partial or unresolved reads to established allele backgrounds. For unresolved informative populations, dedicated 4qA, 4qB or 10qA realignment and Clair3/LongPhase phasing can be used as an additional rescue and QC layer. Phasing does not independently create, split or merge alleles and does not override stronger structural or fingerprint evidence.
 
-### 7. Mosaic and complex structures
+#### Phasing
+Reference-based phasing within D4Z4 is complicated by the repetitive structure of the array, high chr4/chr10 sequence similarity and incomplete read coverage. Therefore, T2T and homolog-specific PS/HP information is used as supporting linkage and QC evidence rather than as the primary definition of an allele. If phase infos disagree with stronger structural or fingerprint evidence, the structural/fingerprint assignment is retained and the disagreement is reported for review.
 
-A recurrent structural population that differs from the dominant allele is retained separately when supported by complete-read evidence.
-Such a mosaic or complex structure can share the same empirical fingerprint (FP) background and the same phase background as another structural allele. Shared fingerprint or phase therefore indicates a common sequence background, but does not determine whether two structural populations represent constitutional alleles, a mosaic derivative, or another complex configuration.
+### 6. Mosaic and complex structures
 
-Small minor populations can be retained as mosaic candidates, while strongly supported complete populations are protected from automatic mosaic demotion.
+Recurrent complete-read structures are retained separately when supported by physical evidence, even when they share the same fingerprint or phase background. Complex rearrangements that cannot be resolved automatically remain available for manual review.
 
-### 8. T2T phasing
+### 7. Allele-specific methylation and BX repeat composition
 
-T2T PS/HP information is used as supporting evidence for:
-
-- chromosome-background linkage
-- follower confirmation
-- subtelomeric linkage
-- technical QC
-
-It is intentionally weighted weaker for allele-assignment than physical structure and empirical fingerprints.
-
-### 9. homolog-specific phasing
-
-For unresolved informative reads, DUCKS4-Advanced can optionally remap and phase against dedicated:
-
-- 4qA
-- 4qB
-- 10qA
-
-references using Clair3 + LongPhase.
-
-Dedicated phase may therefore support assignment of an unresolved partial read to an existing compatible allele and/or provide PS/HP QC information.
-
-Dedicated phase may **not**:
-
-- create a new biological allele solely from HP1/HP2;
-- split an established structural/fingerprint population;
-- merge different SNV populations because they share an HP;
-- reassign established complete reads because of phase;
-- demote a strongly supported complete structure to mosaic solely because of phase.
-
-Raw dedicated phase groups can be retained as **phase-shadow QC views** for manual inspection in IGV.
+Final allele-specific read sets can be realigned to allele-specific references for methylation analysis reporting per-repeat and regional methylation. The BX analysis additionally describes individual D4Z4 repeat units according to BinI/XapI restriction-site patterns.
 
 
-#### Why phasing is not used as primary allele evidence
+### Why phasing is used as supporting evidence
 
-Phasing is used in DUCKS4-Advanced as supporting evidence, particularly in unique subtelomeric regions and for assigning otherwise unresolved reads to established alleles. However, due to the highly repetitive nature of D4Z4 and the strong sequence similarity between chr4 and chr10, reference-based phasing is not always reliable for reconstructing individual D4Z4 alleles. Informative SNVs are unevenly distributed, and alleles that differ substantially from the reference, for example through contractions, expansions or complex rearrangements, may show fragmented alignments that do not necessarily reflect their actual structure. Furthermore, many reads cover only proximal or distal parts of the array, meaning that shared phase information does not provide direct evidence that these regions belong to the same allele. This is particularly relevant for independently phased proximal and distal regions, where PS/HP labels are local and cannot be assumed to correspond across separate analyses without additional evidence. Structural mosaic alleles may also share the same inherited phase background, making phasing alone insufficient to distinguish different structural populations. For these reasons, DUCKS4-Advanced primarily relies on observed read structures, empirical proximal and distal sequence fingerprints, and direct connections established by complete molecules, while phasing is used to support or refine allele assignments where appropriate.
-
-#### Problems observed during validation
-
-During the development and validation of DUCKS4-Advanced, several limitations of phase-based allele assignment were observed. Structurally and empirically consistent allele populations were occasionally separated into different HP groups, while distinct SNV or structural populations could also be assigned to the same HP. Similar discrepancies were observed with dedicated-reference phasing, where reads belonging to the same proximal/distal fingerprint component could show different local phase assignments. In addition, proximal and distal phase information could not always be directly connected, particularly when no complete reads were available to bridge both regions. Structural mosaic populations presented another limitation, as they could share the same inherited phase background as their parental allele and therefore remain indistinguishable by phasing alone. Together with the high sequence similarity between chr4 and chr10 and the fragmented alignments frequently observed within the D4Z4 region, these observations showed that phase-based reconstruction could result in both artificial separation of individual alleles and merging of biologically distinct structural populations.
-
-Consequently, DUCKS4-Advanced establishes allele identity primarily through observed read structures, empirical proximal and distal sequence fingerprints, and direct FP <-> DFP connections supported by complete reads. T2T phasing is subsequently used as supporting evidence for chromosome or subtelomeric linkage, while dedicated 4qA/4qB/10qA phasing is applied as conditional rescue or for additional quality control of unresolved populations. If phase assignments disagree with stronger structural or empirical evidence, the original allele assignment is retained and the discrepancy is documented rather than forcing a phase-based reassignment. Detailed allele assignment and phasing results are available under `data/assignment-qc/`.
-
-
-### 10. Allele-specific methylation
-
-Allele-specific BAMs can be used for methylation calling and summarized across defined D4Z4 regions and is reported for each array-element.
-
-Reported regions include, where available:
-
-- proximal anchor
-- proximal repeat unit
-- array core
-- internal repeats
-- distal repeat
-- pLAM
-- distal unit
-- distal DR1-region on the last full-size repeat-unit
-
-### 11. BX repeat composition
-
-The DUCKS4 BX-check classifies individual D4Z4 repeat units using BinI/XapI restriction-site patterns and generates a per-RU array structure.
-
-This provides an additional structural description of chr4-like, chr10-like and hybrid repeat units and is particularly useful for complex arrays.
+Reference-based phasing within D4Z4 is complicated by the repetitive structure of the array, the high sequence similarity between chr4 and chr10 and incomplete coverage of individual alleles. PS/HP information is therefore used as supporting linkage and QC evidence rather than as the primary definition of an allele. During validation, structurally and empirically consistent read populations were occasionally split across different HP groups, while distinct sequence or structural populations could also share the same HP. Proximal and distal phase groups were not always directly linkable when no complete molecule connected both regions, and mosaic or complex structures could share the same phase background as another structural allele. Therefore, allele identity is primarily derived from physical read structure, proximal and distal fingerprints and complete-read FP <-> DFP linkage. T2T and homolog-specific phasing are used to support unresolved assignments and for QC. If phase disagrees with stronger structural or fingerprint evidence, the original allele reconstruction is retained and the discrepancy is reported under `data/assignment-qc/`.
 
 ---
 
