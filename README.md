@@ -63,7 +63,7 @@ docker run -it --rm -v $(pwd):/data ghcr.io/tamara-nano/ducks4-advanced:latest -
 | --allele-methyl | Run allele-specific methylation after allele assignment. |
 | --variant | Activate full variant calling with Clair3/Sniffles2 on HG38 + T2T phasing for D4Z4-allele assignment. |
 | --phased-t2t-only | Run only T2T FSHD-region phasing for D4Z4-allele assignment, without HG38 variant calling. |
-| --phased | Input BAM contains phasing tags HP/PS from T2T-phasing; use them for allele assignment |
+| --phased | Input BAM is a haplotagged.bam and contains phasing tags HP/PS from T2T-phasing; use them for allele assignment |
 | --threads | Set your amount of threads. Default is 45. |
 
 The output is saved in the folder where the original input file is located.
