@@ -81,7 +81,7 @@ Three types of information are kept separate:
 
 A structural allele is defined from direct long-read evidence, including repeat number, proximal and distal anchors, D4F104S1, pLAM/PAS, terminal S/L state and D4Z4 repeat composition. Complete reads can define an exact structure, while partial reads provide conservative lower-bound information.
 
-### Empirical sequence fingerprint
+### Sequence fingerprint
 
 Recurrent SNVs and small indels observed within the sample are used to define proximal (`FP`) and distal (`DFP`) sequence backgrounds. Complete reads can directly connect an FP and DFP into a fingerprint component (`FC`).
 
@@ -98,17 +98,15 @@ T2T and homolog-specific PS/HP information is used to support linkage of unresol
 
 ## Hierarchy for allele reconstruction
 
-DUCKS4-Advanced uses the following evidence hierarchy:
+Following evidence hierarchy is used for allele reconstruction:
 
 1. Physical D4Z4 structure
-2. Empirical proximal and distal sequence fingerprints
+2. Proximal and distal sequence fingerprints
 3. Complete-read FP <-> DFP linkage
 4. Additional locus-specific sequence features
 5. T2T and homolog-specific phasing
 
 Lower evidence layers do not override contradictions established by stronger physical or empirical evidence.
-
-### Consequences
 
 Phasing is used as supporting evidence and does not override stronger structural or fingerprint evidence. Opposite HP labels are therefore not sufficient to split one structural allele, while shared HP labels are not sufficient to merge distinct structural or sequence populations. Complete-read structures remain protected from reassignment or mosaic demotion based on phase alone. For unresolved partial reads, phase can support assignment to an already established allele when the structural and fingerprint evidence is compatible. If the available evidence is insufficient, the homolog remains unresolved.
 
@@ -127,13 +125,11 @@ D4F104S1 SNVs, SSLP, pLAM/PAS, repeat composition and chromosome-specific marker
 #### SSLP annotation
 The SSLP is reported using the compact annotation described for the classical D4Z4 haplotypes. Because the T2T reference represents the locus in its full genomic sequence context, DUCKS4 extracts the corresponding SSLP sequence from the aligned reads and converts it to a short annotation for comparison with the published haplotype nomenclature. The SSLP repeat structure and the characteristic ±8 bp variant are retained in this representation. SSLP information is evaluated together with the D4F104S1 SNV pattern for haplotype matching.
 
-### 3. Empirical fingerprinting
+### 3. Sample-derived sequence fingerprinting
 
-DUCKS4-Advanced uses a reference-guided but empirically derived fingerprinting approach. Proximal and distal informative reads are realigned to dedicated local references, and recurrent SNVs and small indels are identified directly from the sample.
+DUCKS4-Advanced uses a reference-guided fingerprinting approach to distinguish recurrent sequence backgrounds within a sample. Proximal and distal informative reads are realigned to dedicated local references, and recurrent SNVs and small indels are identified directly from the aligned reads. Variants within the repetitive D4Z4 array are only used when the read is anchored to the corresponding proximal or distal region.
 
-Proximal populations are labelled `FP01`, `FP02`, ... and distal populations `DFP-A01`, `DFP-B01`, ... . Complete molecules can directly connect proximal and distal fingerprints into fingerprint components (`FC`).
-
-Repeat-derived variants are accepted only when physically anchored to the appropriate proximal or distal region.
+Proximal sequence populations are labelled `FP01`, `FP02`, ... and distal populations `DFP-A01`, `DFP-B01`, ... (A/B for qA and qB haplotypes). Complete molecules can directly link proximal and distal fingerprints into fingerprint components (`FC`).
 
 ### 4. Allele reconstruction
 
