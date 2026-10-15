@@ -9,7 +9,7 @@ Experimental major update of DUCKS4 introducing advanced allele assignment and b
 
 DUCKS4-Advanced extends the original DUCKS4 workflow with automated reconstruction of individual D4Z4 alleles from long-read Oxford Nanopore data.
 
-The main aim is to resolve the four D4Z4 chromosome backgrounds at q35 and 10q26 from complete and informative partial reads while retaining complex, mosaic and hybrid structures.
+The main aim is to resolve the four D4Z4 chromosome backgrounds at 4q35 and 10q26 from complete and informative partial reads while retaining complex, mosaic and hybrid structures.
 
 The workflow combines D4Z4-array structure, proximal and distal SNV fingerprints, D4F104S1 and pLAM features, repeat origin, SSLP, PAS, optional phasing, BX repeat composition and allele-specific methylation.
 
