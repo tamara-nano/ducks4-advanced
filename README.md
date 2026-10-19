@@ -4,7 +4,9 @@
 Experimental major update of DUCKS4 introducing advanced allele assignment and based on de-novo variant fingerprinting and homolog-specific phasing. 
 
 > 
-> **ATTENTION: This is an EXPERIMENTAL repository and any output needs to be carefully revised.**  
+> **ATTENTION: This is an EXPERIMENTAL repository and any output needs to be carefully revised.**
+> Note: v0.1.0 may still over-split fingerprint populations in some datasets. This will be addressed in the following update. 
+> 
 > 
 
 DUCKS4-Advanced extends the original DUCKS4 workflow with automated reconstruction of individual D4Z4 alleles from long-read Oxford Nanopore data.
