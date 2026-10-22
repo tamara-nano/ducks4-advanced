@@ -155,8 +155,8 @@ Reference-based phasing within D4Z4 is complicated by the repetitive structure o
 ```text
 FSHD-analysis_SAMPLE/
 ├── allele_summary.tsv
-├── SAMPLE_FSHD_report.html
-├── SAMPLE_FSHD_report.pdf
+├── SAMPLE_FSHD_report.csv
+├── SAMPLE_FSHD_report.txt
 │
 ├── haplotypes/
 │   ├── original haplotype/read tables
