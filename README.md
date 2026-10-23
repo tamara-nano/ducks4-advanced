@@ -5,9 +5,8 @@ Experimental major update of DUCKS4 introducing advanced allele assignment and b
 
 > 
 > **ATTENTION: This is an EXPERIMENTAL repository and any output needs to be carefully revised.**
-> Note: v0.1.0 may still over-split fingerprint populations in some datasets. This will be addressed in the following update. 
 > 
-> 
+
 
 DUCKS4-Advanced extends the original DUCKS4 workflow with automated reconstruction of individual D4Z4 alleles from long-read Oxford Nanopore data.
 
@@ -24,6 +23,13 @@ Facioscapulohumeral muscular dystrophy (FSHD) is associated with genetic and epi
 The original DUCKS4 workflow was developed to resolve individual long reads across this region and integrates D4Z4 repeat sizing, chromosome/haplotype assignment, methylation, structural variation and FSHD2-associated variant analysis.
 
 DUCKS4-Advanced builds on this concept by reconstructing allele-level read populations.
+
+---
+### Update 
+
+v0.2.0 improved fingerprinting and other smaller issues with the image resolved.
+
+Note: v0.1.0 may still over-split fingerprint populations in some datasets. This will be addressed in the following update. 
 
 ---
 
