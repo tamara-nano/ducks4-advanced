@@ -27,6 +27,8 @@ DUCKS4-Advanced builds on this concept by reconstructing allele-level read popul
 ---
 ### Update 
 
+pending: v0.3.0 I will bring back the html/pdf reporting function in the upcoming days. it is removed in v0.2.0 as it is still an experimental repository. please handle the data and output with care!
+
 v0.2.0 improved fingerprinting and other smaller issues with the image resolved.
 
 Note: v0.1.0 may still over-split fingerprint populations in some datasets. This will be addressed in the following update. 
