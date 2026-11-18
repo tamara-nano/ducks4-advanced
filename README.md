@@ -27,7 +27,7 @@ DUCKS4-Advanced builds on this concept by reconstructing allele-level read popul
 ---
 ### Update 
 
-pending: v0.3.0 I will bring back the html/pdf reporting function in the upcoming days. it is removed in v0.2.0 as it is still an experimental repository. please handle the data and output with care!
+v0.3.0 has a html/pdf reporting function. It was removed in v0.2.0 as it is still an experimental repository. Please handle the data and output with care!
 
 v0.2.0 improved fingerprinting and other smaller issues with the image resolved.
 
@@ -62,6 +62,8 @@ docker run -it --rm -v $(pwd):/data ghcr.io/tamara-nano/ducks4-advanced:latest -
 | --variant | Activate full variant calling with Clair3/Sniffles2 on HG38 + T2T phasing for D4Z4-allele assignment. |
 | --phased-t2t-only | Run only T2T FSHD-region phasing for D4Z4-allele assignment, without HG38 variant calling. |
 | --phased | Input BAM is a haplotagged.bam and contains phasing tags HP/PS from T2T-phasing; use them for allele assignment |
+| --pdf-report | Generate an experimental PDF report; manual review required. |
+| --html-report | Generate an experimental HTML report; manual review required. |
 | --threads | Set your amount of threads. Default is 45. |
 
 The output is saved in the folder where the original input file is located.
